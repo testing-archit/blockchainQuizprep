@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain MCQ Practice</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            perspective: 1000px;
+        }
+
+        .screen {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .screen.on {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+            animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        }
+
+        h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .sub {
+            font-size: 16px;
+            color: #94a3b8;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        .slbl {
+            font-size: 13px;
+            font-weight: 600;
+            color: #cbd5e1;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 12px;
+        }
+
+        .chip-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .chip {
+            padding: 10px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.03);
+            color: #cbd5e1;
+            font-size: 15px;
+            font-family: inherit;
+            font-weight: 400;
+            transition: all 0.3s ease;
+        }
+
+        .chip:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .chip.on {
+            border-color: #60a5fa;
+            background: rgba(96, 165, 250, 0.15);
+            color: #60a5fa;
+            font-weight: 600;
+            box-shadow: 0 0 20px rgba(96, 165, 250, 0.2);
+        }
+
+        .go-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            color: #fff;
+            border: none;
+            border-radius: 16px;
+            font-size: 18px;
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px -10px rgba(139, 92, 246, 0.5);
+            margin-top: 1rem;
+        }
+
+        .go-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px -10px rgba(139, 92, 246, 0.6);
+        }
+
+        .go-btn:active {
+            transform: translateY(1px);
+        }
+
+        .pb-wrap {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .pb {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            border-radius: 4px;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-size: 15px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .timer {
+            padding: 6px 12px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #f8fafc;
+            font-size: 14px;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+
+        .timer.w {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fcd34d;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .timer.d {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .streak {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .dot.ok {
+            background: #34d399;
+            box-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
+        }
+
+        .dot.bad {
+            background: #f87171;
+            box-shadow: 0 0 10px rgba(248, 113, 113, 0.5);
+        }
+
+        .tag {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 1rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .tag-overview { background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.3); }
+        .tag-security { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .tag-drone { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .tag-sdn { background: rgba(56, 189, 248, 0.15); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.3); }
+
+        .qnum {
+            font-size: 14px;
+            color: #60a5fa;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+        }
+
+        .qtext {
+            font-size: 22px;
+            font-weight: 500;
+            line-height: 1.4;
+            margin-bottom: 2rem;
+            color: #f8fafc;
+        }
+
+        .opts {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .opt {
+            padding: 16px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.03);
+            color: #e2e8f0;
+            font-size: 16px;
+            font-family: inherit;
+            text-align: left;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            line-height: 1.5;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .opt:hover:not([disabled]) {
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(4px);
+        }
+
+        .opt.ok {
+            background: rgba(52, 211, 153, 0.1);
+            border-color: #34d399;
+            color: #6ee7b7;
+            box-shadow: inset 0 0 20px rgba(52, 211, 153, 0.05);
+        }
+
+        .opt.bad {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #f87171;
+            color: #fca5a5;
+            box-shadow: inset 0 0 20px rgba(239, 68, 68, 0.05);
+        }
+
+        .exp {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 1.2rem;
+            margin-top: 1.5rem;
+            font-size: 15px;
+            color: #cbd5e1;
+            line-height: 1.6;
+            display: none;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .exp.on {
+            display: block;
+        }
+
+        .exp-lbl {
+            font-size: 12px;
+            font-weight: 700;
+            color: #8b5cf6;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .exp-lbl::before {
+            content: '💡';
+        }
+
+        .nxt {
+            width: 100%;
+            padding: 16px;
+            background: #f8fafc;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-family: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            color: #0f172a;
+            display: none;
+            margin-top: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px -5px rgba(255, 255, 255, 0.2);
+        }
+
+        .nxt:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px -5px rgba(255, 255, 255, 0.3);
+        }
+
+        .nxt:active {
+            transform: translateY(1px);
+        }
+
+        .big {
+            font-size: 72px;
+            font-weight: 800;
+            text-align: center;
+            line-height: 1;
+            margin: 1rem 0;
+            background: linear-gradient(to right, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .glbl {
+            font-size: 16px;
+            color: #94a3b8;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .gbadge {
+            display: inline-block;
+            font-size: 16px;
+            font-weight: 700;
+            padding: 8px 24px;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .stats3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 2rem;
+        }
+
+        .st {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 1.2rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .st:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .stv {
+            font-size: 28px;
+            font-weight: 700;
+            color: #f8fafc;
+            margin-bottom: 4px;
+        }
+
+        .stl {
+            font-size: 13px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        .ritem {
+            background: rgba(239, 68, 68, 0.05);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 12px;
+        }
+
+        .rq {
+            font-size: 15px;
+            font-weight: 500;
+            color: #f8fafc;
+            margin-bottom: 8px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .ra {
+            font-size: 14px;
+            color: #34d399;
+            font-weight: 500;
+            padding-left: 24px;
+        }
+
+        .rmark {
+            color: #f87171;
+        }
+
+        .act {
+            display: flex;
+            gap: 16px;
+            margin-top: 2rem;
+        }
+
+        .abtn {
+            flex: 1;
+            padding: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            font-size: 16px;
+            font-family: inherit;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.05);
+            color: #f8fafc;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .abtn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .abtn.pri {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            border: none;
+            box-shadow: 0 10px 20px -10px rgba(139, 92, 246, 0.5);
+        }
+
+        .abtn.pri:hover {
+            box-shadow: 0 15px 25px -10px rgba(139, 92, 246, 0.6);
+        }
+
+        .perfect {
+            text-align: center;
+            font-size: 16px;
+            color: #34d399;
+            padding: 2rem 0;
+            font-weight: 500;
+            background: rgba(52, 211, 153, 0.05);
+            border-radius: 16px;
+            border: 1px solid rgba(52, 211, 153, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <!-- START -->
+        <div class="screen on" id="s-start">
+            <div class="card">
+                <h1>Blockchain MCQ Drill</h1>
+                <div class="sub">30 questions — Blockchain Overview, Cybersecurity, Drones, SDN & 5G. Perfect for
+                    tomorrow's exam.</div>
+                <div class="slbl">Filter by topic</div>
+                <div class="chip-row">
+                    <button class="chip on" data-t="all" onclick="pt(this)">All topics</button>
+                    <button class="chip" data-t="overview" onclick="pt(this)">Overview</button>
+                    <button class="chip" data-t="security" onclick="pt(this)">Cybersecurity</button>
+                    <button class="chip" data-t="drone" onclick="pt(this)">Drones</button>
+                    <button class="chip" data-t="sdn" onclick="pt(this)">SDN & 5G</button>
+                </div>
+                <div class="slbl">Mode</div>
+                <div class="chip-row">
+                    <button class="chip on" data-m="practice" onclick="pm(this)">Practice (show explanation)</button>
+                    <button class="chip" data-m="exam" onclick="pm(this)">Exam (no hints)</button>
+                    <button class="chip" data-m="timed" onclick="pm(this)">Timed — 30s/question</button>
+                </div>
+                <button class="go-btn" onclick="begin()">Start quiz →</button>
+            </div>
+        </div>
+
+        <!-- QUIZ -->
+        <div class="screen" id="s-quiz">
+            <div class="pb-wrap">
+                <div class="pb" id="pb"></div>
+            </div>
+            <div class="meta"><span id="prog"></span><span class="timer" id="tim" style="display:none">0:30</span></div>
+            <div class="streak" id="streak"></div>
+            <span class="tag" id="qtag"></span>
+            <div class="card">
+                <div class="qnum" id="qnum"></div>
+                <div class="qtext" id="qtext"></div>
+                <div class="opts" id="opts"></div>
+                <div class="exp" id="exp">
+                    <div class="exp-lbl">Explanation</div><span id="exptxt"></span>
+                </div>
+            </div>
+            <button class="nxt" id="nxt" onclick="nxt()">Next question →</button>
+        </div>
+
+        <!-- RESULTS -->
+        <div class="screen" id="s-result">
+            <div class="card">
+                <div class="big" id="rbig"></div>
+                <div class="glbl">correct answers</div>
+                <div style="text-align:center;margin-bottom:1rem"><span class="gbadge" id="gbadge"></span></div>
+                <div class="stats3">
+                    <div class="st">
+                        <div class="stv" id="rcor"></div>
+                        <div class="stl">Correct</div>
+                    </div>
+                    <div class="st">
+                        <div class="stv" id="rwrg"></div>
+                        <div class="stl">Wrong</div>
+                    </div>
+                    <div class="st">
+                        <div class="stv" id="rpct"></div>
+                        <div class="stl">Score</div>
+                    </div>
+                </div>
+                <div class="slbl" style="margin-top:.5rem">Missed questions — review these</div>
+                <div id="rlist"></div>
+                <div class="act">
+                    <button class="abtn" onclick="retryW()">Retry wrong only</button>
+                    <button class="abtn pri" onclick="goStart()">New quiz →</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script>
+        const QQ = [
+            { t: 'overview', q: 'What is the scalability trilemma in blockchain?', o: ['Speed and security cannot coexist', 'You cannot simultaneously achieve decentralization, security, and scalability', 'Blockchains cannot scale beyond 1000 TPS', 'Consensus and decentralization are mutually exclusive'], a: 1, e: 'Coined by Vitalik Buterin: any blockchain achieves at most 2 of — decentralization, security, scalability. Layer 2 solutions (Rollups, Lightning) try to break this off the base chain.' },
+            { t: 'overview', q: 'What consensus does Ethereum 2.0 use after "The Merge"?', o: ['Proof of Work', 'PBFT', 'Delegated PoS', 'Proof of Stake'], a: 3, e: 'Ethereum switched to PoS in 2022. Validators stake 32 ETH and are probabilistically selected. ~99.95% more energy efficient than PoW.' },
+            { t: 'overview', q: 'IOTA\'s Tangle uses which data structure instead of a linear chain?', o: ['Merkle Tree', 'Linked List', 'Directed Acyclic Graph (DAG)', 'Hash Ring'], a: 2, e: 'DAG allows transactions to confirm each other in parallel — no miners, no fees. Ideal for IoT micro-transactions on resource-constrained devices.' },
+            { t: 'overview', q: 'What does ZK-SNARK enable?', o: ['Faster mining', 'Prove knowledge without revealing the information itself', 'Shared private keys across nodes', 'Cross-chain atomic swaps'], a: 1, e: 'ZK-SNARK = Zero-Knowledge Succinct Non-Interactive Argument of Knowledge. You prove you know something without revealing what. Used in Zcash and privacy blockchains.' },
+            { t: 'overview', q: 'A blockchain governed by a pre-selected group of organizations is called?', o: ['Public blockchain', 'Private blockchain', 'Consortium blockchain', 'Hybrid blockchain'], a: 2, e: 'Consortium (e.g., R3 Corda, Quorum) is semi-private — governed by multiple organizations. Common in banking consortiums and cross-company supply chains.' },
+            { t: 'overview', q: 'What does the Lightning Network solve for Bitcoin?', o: ['51% attack prevention', 'Quantum resistance', 'Scalability via off-chain payment channels', 'Smart contract capability'], a: 2, e: 'Lightning Network is Layer 2 — channels operate off-chain, only final balances settle on-chain. Solves Bitcoin\'s ~7 TPS bottleneck.' },
+            { t: 'overview', q: 'Which is the leading enterprise permissioned blockchain?', o: ['Solana', 'Bitcoin', 'Hyperledger Fabric', 'IOTA'], a: 2, e: 'Hyperledger Fabric (Linux Foundation) — permissioned, modular, PBFT consensus, no cryptocurrency. Standard for enterprise deployments.' },
+            { t: 'overview', q: 'Atomic swaps use which mechanism to swap assets trustlessly across chains?', o: ['PoW race condition', 'Hash Time-Locked Contracts (HTLCs)', 'A central exchange escrow', 'Multi-signature wallets'], a: 1, e: 'HTLCs (Hash Time-Locked Contracts) ensure either both parties complete the swap or neither does. No centralized exchange needed.' },
+            { t: 'security', q: 'An Eclipse Attack involves?', o: ['DDoSing the genesis block', 'Isolating a node by surrounding it with malicious peers', 'Gaining 51% hash rate', 'Exploiting a reentrancy bug'], a: 1, e: 'Attacker monopolizes all peer connections of a victim node, feeding it a false blockchain view. Can trick victim into accepting double-spends or invalid chains.' },
+            { t: 'security', q: 'Blockchain DNS (ENS, Handshake) primarily defends against?', o: ['SQL injection', 'Brute force passwords', 'DDoS on centralized DNS resolvers', 'Man-in-the-middle on TLS'], a: 2, e: 'Traditional DNS resolvers are single DDoS targets. Blockchain DNS distributes resolution — no central server to overwhelm. ENS = Ethereum Name Service; Namecoin was first.' },
+            { t: 'security', q: 'The DAO hack (2016) exploited which smart contract vulnerability?', o: ['Integer overflow', 'Reentrancy', 'Front-running', 'Timestamp manipulation'], a: 1, e: 'Reentrancy: attacker\'s contract recursively called withdraw() before balance was updated, draining ~$60M ETH. Led to Ethereum hard fork → ETH and ETC.' },
+            { t: 'security', q: 'Self-Sovereign Identity (SSI) eliminates reliance on?', o: ['ISPs', 'Web servers', 'Certificate Authorities (CAs)', 'DNS servers'], a: 2, e: 'Traditional PKI depends on CAs (DigiCert, Let\'s Encrypt) as central authorities. SSI gives identity control to users via on-chain DIDs — no CA needed.' },
+            { t: 'security', q: 'In a 51% attack, what CAN the attacker actually do?', o: ['Steal coins from any wallet', 'Create unlimited coins from nothing', 'Rewrite recent transaction history and double-spend own coins', 'Delete entire blockchain history'], a: 2, e: 'With >50% hash rate, attacker rewrites recent blocks to double-spend own coins. They CANNOT steal others\' funds or create coins from nothing.' },
+            { t: 'security', q: 'What is a Sybil attack?', o: ['Flooding a node with transactions', 'Intercepting messages between nodes', 'Creating many fake identities to gain disproportionate network influence', 'Stealing a validator\'s private key'], a: 2, e: 'Sybil = creating many fake identities. PoW defends by making identity expensive (compute cost). PoS requires staked capital. Core blockchain design issue.' },
+            { t: 'security', q: 'DIDs (Decentralized Identifiers) are standardized by?', o: ['IEEE', 'IETF', 'W3C', 'ISO'], a: 2, e: 'DIDs are a W3C standard. Globally unique, resolvable without a central registry. Resolves to a DID Document containing public keys and service endpoints.' },
+            { t: 'security', q: 'Blockchain-based IDS stores what on-chain?', o: ['Full packet captures', 'TLS certificates', 'Threat intelligence (IOCs, attack signatures)', 'Encrypted user passwords'], a: 2, e: 'IOCs (Indicators of Compromise) and attack signatures are shared immutably across organizations. Nobody can corrupt the shared threat database.' },
+            { t: 'drone', q: 'UTM in blockchain + drone research stands for?', o: ['Universal Transaction Module', 'Unified Telemetry Mesh', 'Unmanned Traffic Management', 'UDP Tunnel Management'], a: 2, e: 'UTM = Unmanned Traffic Management. Blockchain UTM allows drones to register flight plans and acquire airspace tokens via smart contracts — no central controller needed.' },
+            { t: 'drone', q: 'In the hybrid drone data logging architecture, raw sensor data goes to?', o: ['Entirely on the blockchain', 'Drone local storage only', 'IPFS, with only the hash stored on-chain', 'Amazon S3'], a: 2, e: 'Raw data → IPFS (cost-efficient off-chain storage). Hash of data → blockchain (integrity proof). On-chain hash + off-chain data in IPFS is the standard pattern.' },
+            { t: 'drone', q: 'IoD stands for?', o: ['Index of Deployment', 'Internet of Drones', 'Integrated Operations Dashboard', 'Infrastructure of Distribution'], a: 1, e: 'IoD = Internet of Drones. Integrates drones into networked systems. Blockchain provides identity, auth, and data integrity for IoD architectures.' },
+            { t: 'drone', q: 'Why is IOTA cited in drone micropayment research?', o: ['Highest market cap', 'Uses PoW for security', 'Feeless DAG — ideal for micro-transactions between drones and services', 'Runs on satellite networks'], a: 2, e: 'IOTA\'s Tangle (DAG) has no transaction fees and high throughput. Perfect for drones paying tiny amounts for data relay, airspace, or services.' },
+            { t: 'drone', q: 'The biggest technical challenge of running blockchain on drones is?', o: ['Legal regulations', 'GPS signal interference with nodes', 'Resource constraints: battery, CPU, memory', 'Lack of programming languages'], a: 2, e: 'Drones cannot run full blockchain nodes. Solution: lightweight clients, off-chain computation, only hashes/results anchored on-chain.' },
+            { t: 'drone', q: 'For drone swarm coordination, which consensus is most practical?', o: ['Proof of Work', 'Proof of Stake', 'PoA or lightweight PBFT', 'Delegated PoS'], a: 2, e: 'PoW is too energy-intensive. PoA (pre-approved validators) and lightweight PBFT are fast, low-energy, suited for trusted drone fleets — commonly cited in research.' },
+            { t: 'drone', q: 'What does blockchain solve in drone delivery supply chains?', o: ['Drone speed optimization', 'Weather prediction', 'Tamper-evident chain-of-custody and delivery records', 'Battery management'], a: 2, e: 'Every handoff is recorded immutably on-chain. Smart contracts auto-release payment on confirmed delivery (verified by GPS + digital signature). Records cannot be falsified.' },
+            { t: 'sdn', q: 'SDN "separates the control plane from the data plane" means?', o: ['Encryption is separated from routing', 'Routing decisions centralized in software; forwarding remains in hardware', 'Two separate physical networks are built', 'Control traffic is encrypted, data traffic is not'], a: 1, e: 'Control Plane = SDN Controller (brain, decides routing). Data Plane = switches/routers (muscle, forwards packets per instructions). OpenFlow is the protocol connecting them.' },
+            { t: 'sdn', q: 'OpenFlow in SDN is?', o: ['A firewall rule language', 'A 5G spectrum allocation standard', 'A routing algorithm', 'The southbound protocol between SDN controller and network switches'], a: 3, e: 'OpenFlow is the southbound interface (API) between the SDN controller and forwarding hardware. Controller pushes flow table entries telling switches how to handle each traffic type.' },
+            { t: 'sdn', q: 'Three 5G network slice types are?', o: ['LTE, NR, mmWave', 'TCP, UDP, QUIC', 'eMBB, URLLC, mMTC', 'SDN, NFV, MEC'], a: 2, e: 'eMBB = enhanced Mobile Broadband (streaming, AR/VR). URLLC = Ultra-Reliable Low Latency <1ms (autonomous vehicles, remote surgery). mMTC = massive Machine-Type Comms (billions of IoT sensors).' },
+            { t: 'sdn', q: 'Blockchain improves 5G inter-operator roaming by?', o: ['Increasing download speeds', 'Encrypting all roaming traffic', 'Enabling free unlimited roaming', 'Eliminating the central clearinghouse — reducing latency and billing fraud'], a: 3, e: 'Traditional roaming uses central IPX clearinghouses. Blockchain enables direct P2P authentication between operators — no single point of failure, faster settlement, tamper-proof billing records.' },
+            { t: 'sdn', q: 'MEC in 5G + blockchain stands for?', o: ['Multi-Entity Consensus', 'Managed Ethernet Controller', 'Modular Encryption Chain', 'Mobile Edge Computing'], a: 3, e: 'MEC = Mobile Edge Computing. Computation at network edge (base stations) for ultra-low latency. Blockchain secures task offloading — results verified on-chain before payment releases.' },
+            { t: 'sdn', q: 'The main motivation for Blockchain + SDN multi-controller research is?', o: ['Reducing hardware cost', 'Making SDN work without OpenFlow', 'Decentralizing the SDN control plane to eliminate single point of failure', 'Allowing SDN to run on mobile devices'], a: 2, e: 'A single SDN controller is a critical vulnerability. Multi-controller blockchain stores network state (routing, ACLs) on-chain — replicated and immutable. One compromised controller doesn\'t fail the network.' },
+            { t: 'sdn', q: 'Blockchain-based spectrum management in 5G enables?', o: ['Free spectrum for startups', 'Faster downloads for end users', 'Elimination of 5G base stations', 'Dynamic spectrum trading with smart contract-enforced licenses between operators'], a: 3, e: '5G uses mmWave and sub-6GHz spectrum. Blockchain enables auditable dynamic trading between operators. Smart contracts enforce time-slotted usage rights; immutable records prevent interference disputes.' }
+        ];
+
+        let topic = 'all', mode = 'practice', qs = [], qi = 0, sc = 0, log = [], tmr = null, tl = 30, done = false;
+
+        function pt(b) { document.querySelectorAll('[data-t]').forEach(x => x.classList.remove('on')); b.classList.add('on'); topic = b.dataset.t }
+        function pm(b) { document.querySelectorAll('[data-m]').forEach(x => x.classList.remove('on')); b.classList.add('on'); mode = b.dataset.m }
+        function sh(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('on')); document.getElementById(id).classList.add('on'); window.scrollTo(0, 0) }
+        function shu(a) { return a.sort(() => Math.random() - .5) }
+
+        function begin(pool) {
+            qs = pool || shu(topic === 'all' ? [...QQ] : QQ.filter(q => q.t === topic));
+            qi = 0; sc = 0; log = []; sh('s-quiz'); render();
+        }
+
+        function render() {
+            clearInterval(tmr); done = false;
+            const q = qs[qi], tot = qs.length;
+            document.getElementById('pb').style.width = Math.round(qi / tot * 100) + '%';
+            document.getElementById('prog').textContent = 'Question ' + (qi + 1) + ' of ' + tot;
+            document.getElementById('qnum').textContent = 'Q' + (qi + 1);
+            document.getElementById('qtext').textContent = q.q;
+            const tg = document.getElementById('qtag');
+            tg.textContent = { overview: 'Blockchain overview', security: 'Cybersecurity', drone: 'Drones (UAV)', sdn: 'SDN & 5G' }[q.t];
+            tg.className = 'tag tag-' + q.t;
+            document.getElementById('exp').className = 'exp';
+            document.getElementById('nxt').style.display = 'none';
+            const sk = document.getElementById('streak');
+            sk.innerHTML = log.map(r => '<div class="dot ' + (r ? 'ok' : 'bad') + '"></div>').join('');
+            const oc = document.getElementById('opts');
+            oc.innerHTML = '';
+            shu([0, 1, 2, 3]).forEach(i => {
+                const b = document.createElement('button');
+                b.className = 'opt'; b.textContent = q.o[i]; b.dataset.i = i;
+                b.onclick = () => pick(b, i === q.a, q);
+                oc.appendChild(b);
+            });
+            const tc = document.getElementById('tim');
+            if (mode === 'timed') {
+                tl = 30; tc.style.display = 'inline-block'; tc.className = 'timer'; tc.textContent = '0:30';
+                tmr = setInterval(() => {
+                    tl--;
+                    tc.textContent = '0:' + String(tl).padStart(2, '0');
+                    if (tl <= 10) tc.className = 'timer w';
+                    if (tl <= 5) tc.className = 'timer d';
+                    if (tl <= 0) { clearInterval(tmr); timeout(q); }
+                }, 1000);
+            } else tc.style.display = 'none';
+        }
+
+        function timeout(q) {
+            if (done) return; done = true;
+            document.querySelectorAll('.opt').forEach(b => { b.disabled = true; if (+b.dataset.i === q.a) b.classList.add('ok') });
+            log.push(false);
+            if (mode !== 'exam') { document.getElementById('exptxt').textContent = '⏱ Time\'s up! ' + q.e; document.getElementById('exp').className = 'exp on'; }
+            document.getElementById('nxt').style.display = 'block';
+        }
+
+        function pick(b, ok, q) {
+            if (done) return; done = true; clearInterval(tmr);
+            if (ok) sc++;
+            b.classList.add(ok ? 'ok' : 'bad');
+            document.querySelectorAll('.opt').forEach(x => { x.disabled = true; if (!ok && +x.dataset.i === q.a) x.classList.add('ok') });
+            log.push(ok);
+            if (mode !== 'exam') { document.getElementById('exptxt').textContent = q.e; document.getElementById('exp').className = 'exp on'; }
+            document.getElementById('nxt').style.display = 'block';
+        }
+
+        function nxt() { qi++; if (qi >= qs.length) { results(); return; } render(); }
+
+        function results() {
+            sh('s-result');
+            const tot = qs.length, pct = Math.round(sc / tot * 100);
+            document.getElementById('rbig').textContent = sc + '/' + tot;
+            document.getElementById('rcor').textContent = sc;
+            document.getElementById('rwrg').textContent = tot - sc;
+            document.getElementById('rpct').textContent = pct + '%';
+            const gb = document.getElementById('gbadge');
+            let g, s;
+            if (pct >= 90) { 
+                g = 'Excellent ✓'; 
+                s = 'background:rgba(52, 211, 153, 0.1);color:#34d399;border:1px solid rgba(52,211,153,0.3);';
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#34d399', '#60a5fa', '#a78bfa']
+                });
+            }
+            else if (pct >= 75) { g = 'Good'; s = 'background:rgba(96, 165, 250, 0.1);color:#60a5fa;border:1px solid rgba(96,165,250,0.3);' }
+            else if (pct >= 60) { g = 'Needs work'; s = 'background:rgba(245, 158, 11, 0.1);color:#fcd34d;border:1px solid rgba(245,158,11,0.3);' }
+            else { g = 'Keep studying'; s = 'background:rgba(239, 68, 68, 0.1);color:#fca5a5;border:1px solid rgba(239,68,68,0.3);' }
+            gb.textContent = g; gb.style.cssText = s;
+            const rl = document.getElementById('rlist');
+            const ws = log.map((ok, i) => ok ? null : qs[i]).filter(Boolean);
+            if (!ws.length) { rl.innerHTML = '<div class="perfect">🎯 Perfect score! Nothing to review.</div>'; return; }
+            rl.innerHTML = ws.map(q => `<div class="ritem"><div class="rq"><span class="rmark">✕ </span>${q.q}</div><div class="ra">Correct answer: ${q.o[q.a]}</div></div>`).join('');
+        }
+
+        function retryW() {
+            const ws = log.map((ok, i) => ok ? null : qs[i]).filter(Boolean);
+            if (!ws.length) { goStart(); return; }
+            begin(shu(ws));
+        }
+        function goStart() { sh('s-start') }
+    </script>
+</body>
+
+</html>
